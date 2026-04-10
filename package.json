@@ -1,0 +1,9 @@
+{
+  "name": "job-slots-optimizer",
+  "version": "1.0.0",
+  "description": "Job Slots Optimizer — Joveo LinkedIn Supply",
+  "private": true,
+  "dependencies": {
+    "vercel": "^50.42.0"
+  }
+}
