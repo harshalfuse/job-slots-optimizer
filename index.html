@@ -13,12 +13,17 @@ input,select,textarea{font-family:'Sora',sans-serif;outline:none}
 .ndot{width:6px;height:6px;border-radius:50%;background:#F59E0B;flex-shrink:0;box-shadow:0 0 4px rgba(245,158,11,.5)}
 .sbar-w{height:8px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.06)}.sbar-f{height:100%;border-radius:4px;transition:width .6s}
 ::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:#C5D0E0;border-radius:2px}
-</style></head><body>
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+</head><body>
 <div id="root"></div>
 <div id="cm" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);backdrop-filter:blur(8px)" onclick="if(event.target===this)CC()"><div id="cp" style="position:absolute;top:58px;left:50%;transform:translateX(-50%);width:min(1060px,96vw);max-height:82vh;overflow-y:auto;border-radius:14px;animation:modalIn .22s ease"><div id="ci"></div></div></div>
 <div id="dm" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);backdrop-filter:blur(8px)" onclick="if(event.target===this)CD()"><div id="dp" style="position:absolute;top:50px;left:50%;transform:translateX(-50%);width:min(700px,96vw);max-height:88vh;overflow-y:auto;border-radius:14px;animation:modalIn .22s ease"><div id="di"></div></div></div>
 <div id="gm" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);backdrop-filter:blur(8px)" onclick="if(event.target===this)CG()"><div id="gp" style="position:absolute;top:50px;left:50%;transform:translateX(-50%);width:min(820px,96vw);max-height:88vh;overflow-y:auto;border-radius:14px;animation:modalIn .22s ease"><div id="gi"></div></div></div>
 <script>
+const firebaseConfig={apiKey:"AIzaSyBZHR8T4-e_Bs5IspFWkcGi3iit_SCuxYs",authDomain:"job-slots-optimize.firebaseapp.com",databaseURL:"https://job-slots-optimize-default-rtdb.firebaseio.com",projectId:"job-slots-optimize",storageBucket:"job-slots-optimize.firebasestorage.app",messagingSenderId:"654960755749",appId:"1:654960755749:web:8a11aabe6aa7b2801febcc"};
+firebase.initializeApp(firebaseConfig);const db=firebase.database();
 const IO=330,SK={cfg:'jso5cfg',data:'jso5dat',notes:'jso5notes',st:d=>`jso5st${d}`};
 const RC={APAC:'#38BDF8',EMEA:'#4ADE80',NAMER:'#FB923C',LATAM:'#C084FC'};
 const AL={POST:{c:'#16A34A',b:'rgba(22,163,74,.07)'},CLOSE:{c:'#DC2626',b:'rgba(220,38,38,.07)'},REPLACE:{c:'#2563EB',b:'rgba(37,99,235,.07)'}};
@@ -53,8 +58,8 @@ function cSVG(h,m,s,cfg){const cx=70,cy=70,r=64,t=tv();const hA=((h%12)+m/60+s/3
 function gCL(data){const out=[];data.forEach(c=>{const{id,cl,lo,rg,sc,uh,um,eh,em,j,x,bt}=c;const tm=x?(24*60-(uh*60+um))+(eh*60+em):(eh*60+em)-(uh*60+um);const sm=Math.max(1,Math.floor(tm/bt)),bz=Math.ceil(j/bt);for(let b=0;b<bt;b++){const st=(uh*60+um+b*sm)%(24*60),buh=Math.floor(st/60),bum=st%60;const js=b*bz+1,je=Math.min((b+1)*bz,j);out.push({id:`${id}_b${b+1}`,uh:buh,um:bum,a:b===0?'POST':'REPLACE',cl,lo,j:je-js+1,b:bt===1?`B1 All ${j}`:`B${b+1}/${bt} Jobs ${js}-${je}`,rg,sc});}out.push({id:`${id}_cl`,uh:eh,um:em,a:'CLOSE',cl,lo,j,b:`B${bt} end`,rg,sc});});return out;}
 function sAt(istH,data){const uH=Math.floor(((istH*60-IO)+24*60)%(24*60)/60);return data.reduce((s,c)=>{const ss=c.uh*60+c.um,ee=c.eh*60+c.em,cv=uH*60;return s+((c.x?cv>=ss||cv<ee:cv>=ss&&cv<ee)?c.j:0);},0);}
 function cGap(){const SL=501;return WS.map(w=>{const active=DATA.filter(c=>{const cS=(c.uh*60+c.um+IO)%(24*60),cE=c.x?((c.eh*60+c.em+IO)%(24*60))+1440:(c.eh*60+c.em+IO)%(24*60);return c.x?cS<=w.s+360||cE>=w.s:cS<w.e&&cE>w.s;});const tJ=active.reduce((s,c)=>s+c.j,0),sJ=active.filter(c=>c.sc).reduce((s,c)=>s+c.j,0),nJ=tJ-sJ,sAfter=Math.max(0,SL-sJ),dropped=Math.max(0,nJ-sAfter),pct=Math.round(Math.min(tJ/SL*100,100));let rem=SL;const cb=[];active.filter(c=>c.sc).forEach(c=>{const acc=Math.min(rem,c.j);rem-=acc;cb.push({cl:c.cl,lo:c.lo,j:c.j,acc,drop:c.j-acc,sc:true,rg:c.rg});});['APAC','EMEA','LATAM','NAMER'].forEach(rg=>{active.filter(c=>!c.sc&&c.rg===rg).forEach(c=>{const acc=Math.min(rem,c.j);rem-=acc;cb.push({cl:c.cl,lo:c.lo,j:c.j,acc,drop:c.j-acc,sc:false,rg:c.rg});});});return{w,totalJobs:tJ,dropped,pct,cb,used:Math.min(tJ,SL)};});}
-async function sg(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return null;}}
-async function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+async function sg(k){try{const snap=await db.ref('app/'+k).once('value');return snap.val();}catch(e){console.error('sg:',e);try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e2){return null;}}}
+async function ss(k,v){try{await db.ref('app/'+k).set(v);}catch(e){console.error('ss:',e);try{localStorage.setItem(k,JSON.stringify(v));}catch(e2){}}}
 function d2IR(d){return d.map(c=>({cl:c.cl,lo:c.lo,j:c.j}));}
 async function init(){const cfg=await sg(SK.cfg);if(cfg){CFG={...DC,...cfg};dk=CFG.theme==='dark';}const data=await sg(SK.data);if(data)DATA=data;const notes=await sg(SK.notes);if(notes)NOTES=notes;CL=gCL(DATA);TD=tI();VD=TD;IR=d2IR(DATA);await lD(TD);document.body.style.background=tv().bg;rS();setInterval(tick,1000);setInterval(cT,30000);setTimeout(cT,600);}
 async function lD(d){const s=await sg(SK.st(d));if(s){CH=s.checks||{};AU=s.audit||[];}else{CH={};AU=[];}}
@@ -108,5 +113,10 @@ async function sPin(){const pin=document.getElementById('np')?.value?.trim();if(
 function tick(){const i=iN();const clk=document.getElementById('clk');if(clk)clk.textContent=`${fi(i.h)}:${fi(i.m)}:${fi(i.s)}`;const nl=document.getElementById('nlbl');if(nl)nl.textContent=`${fi(i.h)}:${fi(i.m)}`;const im=iM();document.querySelectorAll('.ndl').forEach(n=>n.style.left=im/1440*100+'%');const aw2=aW(),wb=document.getElementById('wbdg');if(wb){if(aw2){wb.style.display='inline-block';wb.style.background=aw2.col+'22';wb.style.border=`1px solid ${aw2.col}44`;wb.style.color=aw2.col;wb.textContent=`${aw2.id} LIVE`;}else wb.style.display='none';}aReset();}
 function tT(){dk=!dk;if(cs==='main')rM();else if(cs==='login')rL();else rA();}
 init();
+db.ref('app/'+SK.data).on('value',snap=>{const val=snap.val();if(val&&JSON.stringify(val)!==JSON.stringify(DATA)){DATA=val;CL=gCL(DATA);IR=d2IR(DATA);if(cs==='main')rM();}});
+db.ref('app/'+SK.notes).on('value',snap=>{const val=snap.val();if(val!==null&&val!==undefined&&JSON.stringify(val)!==JSON.stringify(NOTES)){NOTES=val||{};if(cs==='main')rCL();}});
+db.ref('app/'+SK.cfg).on('value',snap=>{const val=snap.val();if(val&&JSON.stringify(val)!==JSON.stringify(CFG)){const ot=CFG.theme;CFG={...DC,...val};if(val.theme!==ot)dk=CFG.theme==='dark';if(cs==='login')rL();else if(cs==='admin')rA();}});
+function listenDS(){db.ref('app/'+SK.st(TD)).on('value',snap=>{const val=snap.val();if(val){const nCH=val.checks||{},nAU=val.audit||[];if(JSON.stringify(nCH)!==JSON.stringify(CH)||JSON.stringify(nAU)!==JSON.stringify(AU)){CH=nCH;AU=nAU;if(cs==='main'){rCL();rSt();rBn();}}}});}
+listenDS();
 </script>
 </body></html>
